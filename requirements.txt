@@ -1,5 +1,3 @@
-# Add torch with specific index URL
-torch==2.3.0 -f https://download.pytorch.org/whl/cpu
 
 altair==5.2.0
 annotated-types==0.7.0
