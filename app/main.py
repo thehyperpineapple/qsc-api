@@ -69,3 +69,7 @@ async def create_upload_file(file: UploadFile = File(...)):
 # Post the file to the FastAPI server
 # files = {"file": uploaded_file.getvalue()}
 # response = requests.post("http://127.0.0.1:8000/uploadfile/", files=files)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
