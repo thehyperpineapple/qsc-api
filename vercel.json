@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "app/wsgi.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "buildCommand": "./build.sh"
+      }
     }
   ],
   "routes": [
