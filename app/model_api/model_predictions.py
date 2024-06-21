@@ -21,7 +21,7 @@ def machine_learning(x_input):
     # Define Empty List to store model name and predicted outcome
     model_list = []
     # Define path
-    path = os.path.join("../model_api/",os.getenv('ML_PATH'))
+    path = os.path.join("./model_api/","models/Supervised/")
 
     # Loop through all models and make predictions
     for model in os.listdir(path):
@@ -63,7 +63,7 @@ class MLPRegressor(nn.Module):
 
 # Function to predict output using the MLP Regressor
 def deep_learning(x_input):
-    path = os.path.join("../model_api/",os.getenv('DL_PATH'))
+    path = os.path.join("./model_api/","models/Neural Network")
     model_weights = os.listdir(path)
     model = MLPRegressor() # Create the Object
     model.load_state_dict(torch.load(os.path.join(path,model_weights[0]))) # Load the model weights
