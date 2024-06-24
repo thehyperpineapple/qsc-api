@@ -125,7 +125,7 @@ def bulk_prediction(df):
     input_column = 'UPN Count'
 
     # Path to the folder containing the ML models
-    models_folder = os.path.join("../model_api/", os.getenv('ML_PATH'))
+    models_folder = os.path.join("./model_api/","models/Supervised/")
 
     # Use ThreadPoolExecutor to parallelize model loading and predictions
     with ThreadPoolExecutor() as executor:
@@ -145,7 +145,7 @@ def bulk_prediction(df):
 
 def bulk_deep_learning(df):
     input_column = 'UPN Count'
-    path = os.path.join("../model_api/",os.getenv('DL_PATH'))
+    path = os.path.join("./model_api/","models/Neural Network")
     model_weights = os.listdir(path)
     model = MLPRegressor() # Create the Object
     model.load_state_dict(torch.load(os.path.join(path,model_weights[0]))) # Load the model weights
