@@ -160,6 +160,11 @@ def bulk_deep_learning(df):
 
     with torch.no_grad():
         predictions = model(torch.from_numpy(x_input)) # Make predictions
+        # Convert the tensor to a numpy array
+        predictions = predictions.numpy()
+    
+        # Flatten the predictions
+        predictions = predictions.flatten().tolist()    
         predictions = [min(0.99, pred) for pred in predictions]
     if predictions is not None:
             df['MLP Regressor Predictions'] = predictions

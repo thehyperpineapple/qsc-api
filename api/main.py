@@ -3,11 +3,10 @@ from fastapi import FastAPI, Request, Response, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from model_api import model_predictions, utility_functions
-import asyncio
 from io import BytesIO
 import pandas as pd
-import openpyxl 
-import csv 
+import chardet
+
 
 
 
@@ -35,13 +34,25 @@ async def return_single_response(total_count):
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile = File(...)):
     contents = await file.read()
+    
     # Debugging: Print the file name and first few bytes
     print(f"Received file: {file.filename}")
     print(f"File size: {len(contents)} bytes")
 
-   # Read the file into a DataFrame
+    # Determine the file encoding
+    result = chardet.detect(contents)
+    encoding = result['encoding']
+
+    # Read the file into a DataFrame
     try:
-        df = pd.read_csv(BytesIO(contents))
+        # Attempt to detect the delimiter
+        try:
+            sample = contents.decode(encoding)
+            delimiter = pd.io.common.infer_compression(sample, None)
+        except Exception:
+            delimiter = ','  # Fallback to comma if detection fails
+        
+        df = pd.read_csv(BytesIO(contents), delimiter=delimiter, encoding=encoding)
     except Exception as e:
         return {"error": str(e)}
     
@@ -49,6 +60,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     print(f"DataFrame shape: {df.shape}")
     print(df.head())
 
+    # Apply the analysis and predictions
     new_df = utility_functions.analyze_descriptions(df)
     new_df = model_predictions.bulk_prediction(new_df)
     new_df = model_predictions.bulk_deep_learning(new_df)
@@ -60,11 +72,13 @@ async def create_upload_file(file: UploadFile = File(...)):
     output = BytesIO()
     if file.filename.endswith('.xlsx'):
         new_df.to_excel(output, index=False)
+        media_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     else:
         new_df.to_csv(output, index=False)
+        media_type = 'text/csv'
     
     output.seek(0)
-    return StreamingResponse(output, media_type='application/octet-stream', headers={"Content-Disposition": f"attachment; filename={file.filename}"})
+    return StreamingResponse(output, media_type=media_type, headers={"Content-Disposition": f"attachment; filename={file.filename}"})
 
 # Post the file to the FastAPI server
 # files = {"file": uploaded_file.getvalue()}
